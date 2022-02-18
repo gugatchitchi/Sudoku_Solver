@@ -6,6 +6,10 @@ class Board:
         self.numbers_list = numbers_list
         self.size = len(numbers_list)
         self.history = []
+    #   Count zeros for future check
+        self.zeros = 0
+        for i in range(self.size):
+            self.zeros += self.numbers_list[i].count(0)
 
 
     # Prints Board in the console with lines
@@ -35,18 +39,19 @@ class Board:
         for col in range(self.size):
             for row in range(self.size):
                 if self.numbers_list[col][row]==0:
+                    print('Now is changing', row,col)
                     # When zero is found we should add some number
                     # If board is happy with that number we stop
                     # if it is not we check next number
                     if self.update_number(row, col, 1):
-                        print('Number was Updated Succesfuly')
+                        print('New number was Updated Successfully')
                         return
                     # If board does not like any number for that position
                     # We should change previous numbers, until board likes it
-                    for hist in range(self.history):
-                        row = hist['row']
-                        col = hist['col']
-                        num = hist['num']
+                    for hist in self.history:
+                        if self.update_number(hist['row'], hist['col'], hist['num']):
+                            print('Historical number was Updated Successfully')
+                            return
 
 
 
@@ -78,7 +83,7 @@ class Board:
                 elif self.numbers_list[row][col] == 0:
                     continue
                 else:
-                    print('Number was doubled in a row: ', row+1)
+                    # print('Number was doubled in a row: ', row+1)
                     self.print_board()
                     return False
 
@@ -91,7 +96,7 @@ class Board:
                 elif self.numbers_list[row][col] == 0:
                     continue
                 else:
-                    print('Number was doubled in a column: ', col+1)
+                    # print('Number was doubled in a column: ', col+1)
                     self.print_board()
                     return False
 
@@ -109,9 +114,19 @@ class Board:
                         elif self.numbers_list[box_x * 3 + x][box_y * 3 + y] == 0:
                             continue
                         else:
-                            print('Number was doubled in a box: ', box_x + 1, '-', box_y + 1)
-                            self.print_board()
+                            # print('Number was doubled in a box: ', box_x + 1, '-', box_y + 1)
+                            # self.print_board()
                             return False
 
         # Final state if all the checks are successful
         return True
+
+
+    # Check if board is filled successfully
+    def check_if_done(self):
+        if len(self.history) == self.zeros:
+            print('Board is Done')
+            return True
+        else:
+            return False
+

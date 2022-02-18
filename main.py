@@ -28,5 +28,11 @@ initial_board = b.Board([
 # print(final_board.check_if_solved())
 # final_board.print_board()
 initial_board.print_board()
-initial_board.add_number()
+
+# print(initial_board.num_zeros)
+while True:
+    if initial_board.check_if_done():
+        break
+    initial_board.add_number()
+
 initial_board.print_board()
