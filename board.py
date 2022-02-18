@@ -10,6 +10,8 @@ class Board:
         self.zeros = 0
         for i in range(self.size):
             self.zeros += self.numbers_list[i].count(0)
+    #   number of iterations
+        self.total_iterations = 0
 
 
     # Prints Board in the console with lines
@@ -39,27 +41,49 @@ class Board:
         for col in range(self.size):
             for row in range(self.size):
                 if self.numbers_list[col][row]==0:
-                    print('Now is changing', row,col)
+                    # print('Now is changing', row,col)
+                    # print('Length of history', len(self.history))
                     # When zero is found we should add some number
                     # If board is happy with that number we stop
                     # if it is not we check next number
                     if self.update_number(row, col, 1):
-                        print('New number was Updated Successfully')
+                        # print('New number was Updated Successfully')
                         return
                     # If board does not like any number for that position
                     # We should change previous numbers, until board likes it
-                    for hist in self.history:
-                        if self.update_number(hist['row'], hist['col'], hist['num']):
-                            print('Historical number was Updated Successfully')
-                            return
+                    while True:
+                        hist = self.history[-1]
+                        # print('Whole history: ', self.history)
+                        # print('last one: ', hist)
+                        if self.update_number(hist['row'], hist['col'], hist['num'], 1):
+                            # print('Historical number was Updated Successfully')
+                            break
+                        else:
+                            self.numbers_list[hist['col']][hist['row']] = 0
+                            self.history.pop(-1)
+                    return
 
 
 
-    def update_number(self, row, col, min_num):
+    def update_number(self, row, col, min_num, is_history=0):
+        # Add iteration
+        self.total_iterations += 1
+        # Check for 9s
+        if self.numbers_list[col][row] == 9:
+            return False
+        # If its historical number we should start with the next number
+        if is_history == 1:
+            start = min_num+1
+        else:
+            start = min_num
         # We check if any numbers could be added to that coordinate
-        for num in range(min_num, self.size + 1):
+        for num in range(start, self.size + 1):
             self.numbers_list[col][row] = num
             if self.check_board():
+                # Add changes to history
+                # If its a old numbers change we should first delete that record and then right new one
+                if is_history == 1:
+                    self.history.pop(-1)
                 self.history.append({
                     'row': row,
                     'col': col,
@@ -72,7 +96,7 @@ class Board:
         return False
 
 
-    # Checks board after every itteration
+    # Checks board after every iteration
     def check_board(self):
         # Check rows
         for row in range(self.size):
@@ -84,7 +108,7 @@ class Board:
                     continue
                 else:
                     # print('Number was doubled in a row: ', row+1)
-                    self.print_board()
+                    # self.print_board()
                     return False
 
         # Check columns
@@ -97,7 +121,7 @@ class Board:
                     continue
                 else:
                     # print('Number was doubled in a column: ', col+1)
-                    self.print_board()
+                    # self.print_board()
                     return False
 
         # Check each box
